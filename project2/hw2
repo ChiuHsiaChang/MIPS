@@ -1,0 +1,298 @@
+ .data
+number: .space 12
+input: .asciiz "Please input an identification number:\n "
+illegal: .asciiz "The number is illegal\n"
+legal: .asciiz "The number is legal.\n"
+i: .byte 0x00
+A: .byte 0x41
+Z: .byte 0x5A
+
+.text
+
+main:
+    li $s0,10		#s0號register用於儲存最後一個字符\n
+	li $s1,32		#s1用於儲存空格
+	li $s2,0		#用於儲存a
+	li $s3,0		#用於儲存b
+	li $s4,10		
+	li $s5,2		#用於放count
+	li $s6,1		#i
+	la $a0,input		#將input1内容加載到a0
+	li $v0,4			#v0=4,呼叫Syscall打印a0中儲存的input
+	syscall			#打印
+	li $v0, 8		#v0=8,呼叫syscall將輸入字串儲存到a0
+	la $a0, number		#將cipher的address寫到
+	li $a1, 12		#最大長度為
+	syscall	
+	
+	la $t4,number
+	lb $t1,($t4)	#讀取第一個字符
+	
+illegal1:
+	slti $t2,$t1,65		#檢查讀取字符ascii是否小於65 char<65?
+	bne $0,$t2,error	#若小於，報錯
+	slti $t2,$t1,91		#檢查讀取字符ascii是否小於123 char<123?
+	beq $0,$t2,error	#若大於，報錯
+	
+mach:
+	li $t2,65
+	beq $t2,$t1,isa
+	li $t2,66
+	beq $t2,$t1,isb
+	li $t2,67
+	beq $t2,$t1,isc
+	li $t2,68
+	beq $t2,$t1,isd
+	li $t2,69
+	beq $t2,$t1,ise
+	li $t2,70
+	beq $t2,$t1,isf
+	li $t2,71
+	beq $t2,$t1,isg
+	li $t2,72
+	beq $t2,$t1,ish
+	li $t2,73
+	beq $t2,$t1,isi
+	li $t2,74
+	beq $t2,$t1,isj
+	li $t2,75
+	beq $t2,$t1,isk
+	li $t2,76
+	beq $t2,$t1,isl
+	li $t2,77
+	beq $t2,$t1,ism
+	li $t2,78
+	beq $t2,$t1,isn
+	li $t2,79
+	beq $t2,$t1,iso
+	li $t2,80
+	beq $t2,$t1,isp
+	li $t2,81
+	beq $t2,$t1,isq
+	li $t2,82
+	beq $t2,$t1,isr
+	li $t2,83
+	beq $t2,$t1,iss
+	li $t2,84
+	beq $t2,$t1,ist
+	li $t2,85
+	beq $t2,$t1,isu
+	li $t2,86
+	beq $t2,$t1,isv
+	li $t2,87
+	beq $t2,$t1,isw
+	li $t2,88
+	beq $t2,$t1,isx
+	li $t2,89
+	beq $t2,$t1,isy
+	li $t2,90
+	beq $t2,$t1,isz
+	
+	
+isa:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,0
+	add $s3,$t5,$s2
+	j sum1
+isb:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,1
+	add $s3,$t5,$s2
+	j sum1
+isc:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,2
+	add $s3,$t5,$s2
+	j sum1
+isd:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,3
+	add $s3,$t5,$s2
+	j sum1
+ise:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,4
+	add $s3,$t5,$s2
+	j sum1
+isf:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,5
+	add $s3,$t5,$s2
+	j sum1
+isg:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,6
+	add $s3,$t5,$s2
+	j sum1
+ish:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,7
+	add $s3,$t5,$s2
+	j sum1
+isi:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,4
+	add $s3,$t5,$s2
+	j sum1
+isj:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,8
+	add $s3,$t5,$s2
+	j sum1
+isk:
+	li $t5,1
+	add $s2,$t5,$s2
+	li $t5,9
+	add $s3,$t5,$s2
+	j sum1
+isl:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,0
+	add $s3,$t5,$s2
+	j sum1
+ism:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,1
+	add $s3,$t5,$s2
+	j sum1
+isn:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,2
+	add $s3,$t5,$s2
+	j sum1
+iso:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,5
+	add $s3,$t5,$s2
+	j sum1
+isp:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,3
+	add $s3,$t5,$s2
+	j sum1
+isq:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,4
+	add $s3,$t5,$s2
+	j sum1
+isr:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,5
+	add $s3,$t5,$s2
+	j sum1
+iss:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,6
+	add $s3,$t5,$s2
+	j sum1
+ist:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,7
+	add $s3,$t5,$s2
+	j sum1
+isu:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,8
+	add $s3,$t5,$s2
+	j sum1
+isv:
+	li $t5,2
+	add $s2,$t5,$s2
+	li $t5,9
+	add $s3,$t5,$s2
+	j sum1
+isw:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,0
+	add $s3,$t5,$s2
+	j sum1
+isx:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,1
+	add $s3,$t5,$s2
+	j sum1
+isy:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,2
+	add $s3,$t5,$s2
+	j sum1
+isz:
+	li $t5,3
+	add $s2,$t5,$s2
+	li $t5,3
+	add $s3,$t5,$s2
+	j sum1
+
+sum1:
+	li $t3,9
+	mult $t3, $s1
+	mflo $t2
+	add $t2,$t2,$s3
+
+	
+	
+	li $s7,1
+	li $t0,32
+	li $t7,9
+	li $t3,48
+	
+sumloop:
+	lb $t1,($t4)		
+	beq $s0,$t1,checkiflegal	#直到讀取的字符為'\ n' ,執行checkiflegal
+	slt $t5,$t1,$t3		#檢查讀取字符ascii是否小於48 char<48?
+	bne $0,$t5,error	#若小於，報錯
+	slti $t5,$t1,58	#檢查讀取字符ascii是否小於58 char<58?
+	beq $0,$t5,error	#若大於等於，報錯
+	beq $t0,$t1,error	#a[i]==32
+	slt $t5,$s4,$s5		#10<count?
+	beq $0,$t5,error
+	add $s5,$s7,$s5		#count++
+	sub $t5,$t7,$s6		#t5=9-i
+	sub $t6,t1,$t3		#t6=a[i]-'0'
+	mult $t5, $t6
+	mflo $t5
+	add $t2,$t2,$t5
+	j sumloop
+	
+checkiflegal:
+	sub $t6,$t1,$t3	#t6=(a[9]-'0')
+	add $t2,$t2,$t6	#t2=sum+(a[9]-'0')
+	div $t2,$s4
+	mfhi $t6
+	bnq $0,$t6,error
+	la $a0,legal		#將legal内容加載到a0
+	li $v0,4			#v0=4,呼叫Syscall打印a0中儲存的input
+	syscall
+	li $v0, 10 #system call code for exit
+	syscall
+
+error:
+	la $a0,illegal		#將legal内容加載到a0
+	li $v0,4			#v0=4,呼叫Syscall打印a0中儲存的input
+	syscall
+	li $v0, 10 #system call code for exit
+	syscall
+	

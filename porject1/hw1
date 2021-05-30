@@ -1,0 +1,128 @@
+.data
+cipher: .space 21
+shift: .space 4
+input1: .asciiz "please input your cipher-text (A-Z,maximum string length is 20)\n "
+warnning: .asciiz "please input the right cipher ！\n"
+warnning2: .asciiz "please input the right shift ！\n"
+input2: .asciiz "please input the shift(0-26) \n"
+message: .asciiz "output: \n"
+
+.text
+
+main: 
+    li $s0,10		#s0號register用於儲存最後一個字符\n
+	li $s1,32		#s1用於儲存空格
+	li $s2,0
+	la $a0,input1		#將input1内容加載到a0
+	li $v0,4			#v0=4,呼叫Syscall打印a0中儲存的input1
+	syscall			#打印
+	li $v0, 8		#v0=8,呼叫syscall將輸入字串儲存到a0
+	la $a0, cipher		#將cipher的address寫到
+	li $a1, 20		#最大長度為20
+	syscall			
+	la $a0,input2		#將input2内容加載到a0
+	li $v0,4			#v0=4,呼叫Syscall打印a0中儲存的input2
+	syscall			
+	li $v0,5			#v0=5,read int
+	syscall			
+	li $t0,0			#8設置為零
+	add $t0,$t0,$v0		#將shift值儲存到8
+
+#test&&check2:  
+#		do{
+#		if (-26<=input && input<26)
+#		shift=shift-26;}
+#		while (shift >=0 ) 
+
+	
+test:	slti $t3,$v0,26		#input<26,$t3=1;input>=26,$t3=0
+	bne $0,$t3,check2      #if shift<26, check2
+	bltz $t0,endtest		   #if shift<0,endtest
+	li $t5,-26
+	add $t0,$t5,$t0		# addi $t0,-26 while shift >=0 , shift = shift-26
+	j test
+	
+	
+check2:	slti $t3,$v0,-26		#if input < -26, $t3=1, else if input >=-26 $t3=0
+	beq $0,$t3,endtest		#if input >= -26, endtest
+
+
+	
+# endtest && begin ：shift+=26
+
+
+endtest: bgtz $t0,begin		#if shift>0, begin （0-26）
+	li $t5,26
+	add $t0,$t5,$t0
+	#addi $t0,26		# shift=shift+26
+	
+
+#test2: while (shift>0) do {shift+=26;}
+
+test2:	bgtz $t0,begin	 #if shift>0, begin
+	li $t5,26
+	add $t0,$t5,$t0
+	#addi $t0,26		#shift=shift+26
+	j test2
+
+begin:  add $s2,$0,$t0	# $s2=shift 
+
+
+endtest2:la $t4,cipher #load address，將cipher的address存到$t4
+
+loop:	lb $t1,($t4)		#將cipher的第一個字符加載到內存寄存器中
+	beq $s0,$t1,ausgabe	#直到讀取的字符為'\ n' ,執行ausgabe
+	beq $s1,$t1,leer		#如果是空格，執行leer
+	slti $t2,$t1,65		#檢查讀取字符ascii是否小於65 char<65?
+	bne $0,$t2,error	#若小於，報錯
+	slti $t2,$t1,123		#檢查讀取字符ascii是否小於123 char<123?
+	beq $0,$t2,error	#若大於，報錯
+	slti $t2,$t1,91		#檢查輸入的字符是否為大寫字母(64<大寫<91) char<91?
+	beq $t2,$0,else 	#若不是，else
+	add $t1,$t1,$t0		#是大寫，進行shift操作
+	slti $t2,$t1,91		#判斷進行完shift是否還在字母範圍内
+	bne $t2,$0,store	#如果在，store
+	li $t5,-26
+	add $t1,$t5,$t1
+	#addi $t1,-26			#否則-26再store
+	j store			
+	
+	
+else:	slti $t2,$t1,97		#是否為其他符號(91-96) 91<char<97?
+	bne $0,$t2,error		#若是，報錯
+	add $t1,$t1,$t0		#如果是小寫，進行shift操作
+	slti $t2,$t1,123		#判斷進行完shift是否還在字母範圍内
+	bne $t2,$0,store	#如果在，store
+	li $t5,-26
+	add $t1,$t5,$t1
+	#addi $t1,-26		#否則-26再store
+	j store
+	
+leer:   add $t1,$t1,$0  #如果是空格，不進行操作
+
+
+store:	sb $t1,($t4)		#store byte,將cipher存入$t1
+	li $t5,1
+	add $t4,$t5,$t4
+	#addi $t4,1		#將pointer指向下一個字符位置
+	j loop			
+	
+	
+ausgabe:	
+	li $v0,4
+	la $a0, message
+	syscall
+	li $v0,4
+	la $a0, cipher		#輸出加密後的密碼
+	syscall			
+	
+	
+ende:	li $v0, 10
+	syscall
+  #jr $31			#Programmende
+
+
+error:	li $v0,4
+	la $a0, warnning		#Ausgabe einer Errormessage im Terminal
+	syscall			#Aufruf des Syscalls
+	j main			#Neustart des Einlesens
